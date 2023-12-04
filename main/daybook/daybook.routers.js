@@ -5,6 +5,7 @@ const {
   daybookPost,
   daybookPut,
   daybookDelete,
+  daybookGetActivitis
 } = require("../daybook/daybook.controllers");
 const {
   isRoleValid,
@@ -23,11 +24,15 @@ const router = Router();
 // GET ITEM
 router.get("/", [validateJWT, /* hasRole("ADMIN"), */ validateFields], daybookGet);
 
+
+// GET ITEM
+router.get("/:id", [/* validateJWT, */ /* hasRole("ADMIN"), */ /* validateFields */], daybookGetActivitis);
+
 // CREATE
 router.post("/",
   [
     validateJWT,
-    /* hasRole("ADMIN"), */
+    hasRole("teacher"),
     check("day", "The name for the day is invalid").not().isEmpty(),
     /* check("name").custom(NameNotEmpty), */
     validateFields,
@@ -40,7 +45,7 @@ router.put(
   "/:id",
   [
     validateJWT,
-    /* hasRole("ADMIN"), */
+    hasRole("teacher"),
     /* check("name").custom(NameNotEmpty), */
     check("id", "Not valid id").isUUID(4),
     check("id").custom(existsDaybookForId),
@@ -54,7 +59,7 @@ router.delete(
   "/:id",
   [
     validateJWT,
-    /* hasRole("ADMIN"), */
+    hasRole("teacher"),
     check("id", "Not valid id").isUUID(4),
     check("id").custom(existsDaybookForId),
     validateFields,

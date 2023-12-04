@@ -23,8 +23,8 @@ const router = Router();
 // GET ITEM
 router.get("/",
   [
-    /* validateJWT, */
-    /*hasRole("ADMIN"),*/
+    validateJWT,
+    hasRole(["admin"]),
     validateFields
   ],
   institutionGet
@@ -34,8 +34,8 @@ router.get("/",
 router.post(
   "/",
   [
-    /* validateJWT, */
-    /* hasRole("ADMIN"), */
+    validateJWT,
+    hasRole(["admin"]),
     /* check("role").custom(isRoleValid), */
     check("name", "The name is empty").not().isEmpty(),
     check("name").isLength({ min: 2, max: 20  }).withMessage('The name must be longer than 2 characters and less of 20'),
@@ -59,8 +59,8 @@ router.post(
 router.put(
   "/:id",
   [
-    /* validateJWT, */
-    /* hasRole("ADMIN"), */
+    validateJWT,
+    hasRole(["admin"]),
     /* check("role").custom(isRoleValid), */
     check("id", "Not valid id").isUUID(4),
     check("id").custom(existsInstitutionForId),
@@ -80,9 +80,9 @@ router.put(
 router.delete(
   "/:id",
   [
-    /* validateJWT, */
+    validateJWT,
     //isAdminRole,
-    /* hasRole("ADMIN"), */
+    hasRole(["admin"]),
     check("id", "Not a valid ID").isUUID(4),
     check("id").custom(existsInstitutionForId),
 

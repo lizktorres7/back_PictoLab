@@ -21,13 +21,13 @@ const router = Router();
 
 
 // GET ITEM
-router.get("/", [/* validateJWT, hasRole(["admin"]), */ validateFields], roleGet);
+router.get("/", [validateJWT, hasRole(["admin"]), validateFields], roleGet);
 
 // CREATE
 router.post("/",
   [
-    /* validateJWT, */
-    /* hasRole(["admin", "teacher"]), */
+    validateJWT,
+    hasRole(["admin"]),
 
     check("name", "The name is empty").not().isEmpty(),
     check("name").isLength({ min: 2, max: 20  }).withMessage('The name must be longer than 2 characters and less of 20'),
@@ -45,8 +45,8 @@ router.post("/",
 router.put(
   "/:id",
   [
-    /* validateJWT, */    
-    /*hasRole("ADMIN"),*/
+    validateJWT,  
+    hasRole(["admin"]),
     
     check("id", "Not valid id").isUUID(4),
     check("id").custom(existsRoleForId),

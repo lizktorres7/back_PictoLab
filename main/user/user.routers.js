@@ -10,7 +10,6 @@ const {
   isRoleValid,
   emailExists,
   existsUserForId,
-  PhoneExists,
 } = require("../heplers/validate-db");
 const { NameNotEmpty, EmailNotEmpty, PhoneNumberValid } = require("../heplers/validate-empty");
 const { validateFields } = require("../../middlewares/validate-fields");
@@ -22,8 +21,8 @@ const router = Router();
 
 // GET ITEM
 router.get("/", [
- /*  validateJWT, */
-  /* hasRole("admin") */
+ validateJWT,
+  hasRole("admin"),
   /* isAdminRole, */
   validateFields
 ],
@@ -34,8 +33,8 @@ router.get("/", [
 router.post(
   "/",
   [
-    /* validateJWT, */
-    /* hasRole("admin") */
+    validateJWT,
+    hasRole("admin"),
     /* isAdminRole, */
 
     check("email", "The email is invalid").isEmail(),
@@ -43,7 +42,7 @@ router.post(
     check("password", "Invalid password, must exceed 6 characters").isLength({
       min: 6,
     }),
-    /* check("role").custom(isRoleValid), */
+
     validateFields,
   ],
   userPost
@@ -53,17 +52,13 @@ router.post(
 router.put(
   "/:id",
   [
-    /* validateJWT, */
-    /* hasRole("admin") */
+    validateJWT,
+    hasRole("admin"),
     /* isAdminRole, */
-    check("name").custom(NameNotEmpty),
-    check("lastname").custom(NameNotEmpty),
-    check("phone").custom(PhoneNumberValid),
     check("email").custom(EmailNotEmpty),
     check("email", "The email is invalid").isEmail(),
     check("id", "Not valid id").isUUID(4),
     check("id").custom(existsUserForId),
-    check("role").custom(isRoleValid),
     validateFields,
   ],
   usersPut
@@ -73,8 +68,8 @@ router.put(
 router.delete(
   "/:id",
   [
-    /* validateJWT, */
-    /* hasRole("admin") */
+    validateJWT,
+    hasRole("admin"),
     /* isAdminRole, */
     check("id", "Not a valid ID").isUUID(4),
     check("id").custom(existsUserForId),

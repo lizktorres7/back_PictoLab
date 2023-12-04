@@ -14,8 +14,7 @@ router.post(
   "/login",
   [
     check("email", "The email is invalid").isEmail(),
-    check("password", "The email is invalid").not().isEmpty(),
-    check("code", "The code is invalid").optional().isString(),
+    check("password", "The password is empty").not().isEmpty(),
     validateFields,
     /* assignRoleToUser, */
   ],

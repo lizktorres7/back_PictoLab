@@ -21,13 +21,13 @@ const router = Router();
 
 
 // GET ITEM
-router.get("/", [validateJWT, /* hasRole("ADMIN"), */ validateFields], classroomGet);
+router.get("/", [validateJWT, hasRole("teacher","admin"), validateFields], classroomGet);
 
 // CREATE
 router.post("/", 
 [
   validateJWT, 
-  /* hasRole("ADMIN"), */ 
+  hasRole("teacher","admin"),
   check("name", "The name is invalid").not().isEmpty(),
   validateFields,
 ], 
@@ -39,7 +39,7 @@ router.put(
   "/:id",
   [
     validateJWT,
-    /* hasRole("ADMIN"), */
+    hasRole("teacher","admin"),
     check("name").custom(NameNotEmpty),
     check("subject").custom(NameNotEmpty),
     check("id", "Not valid id").isUUID(4),
@@ -54,7 +54,7 @@ router.delete(
   "/:id",
   [
     validateJWT,
-    /* hasRole("ADMIN"), */
+    hasRole("teacher","admin"),
     check("id", "Not valid id").isUUID(4),
     check("id").custom(existsClassroomForId),
     validateFields,

@@ -31,7 +31,7 @@ const hasRole = (...roles) => {
         }
 
         try {
-            const { roleId, name } = req.user
+            const { roleId } = req.user
             const role = await Role.findOne({
                 where: {
                     id: roleId
@@ -39,7 +39,7 @@ const hasRole = (...roles) => {
             })
             if (!roles.includes(role.name)) {
                 //return res.status(401).json({error:`${ req.user.name } user is not permitted`})
-                return res.json({ status: 401, error: `${name} user is not permitted` })
+                return res.json({ status: 401, error: `User is not permitted` })
             }
         } catch (error) {
             return res.json({ status: 500, error: 'Server error' })

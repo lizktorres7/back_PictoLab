@@ -21,13 +21,13 @@ const router = Router();
 
 
 // GET ITEM
-router.get("/", [validateJWT, /* hasRole("ADMIN"), */ validateFields], activityGet);
+router.get("/", [validateJWT, validateFields], activityGet);
 
 // CREATE
 router.post("/",
   [
     validateJWT,
-    /* hasRole("ADMIN"), */
+    hasRole("teacher","admin"),
     check("name", "The name is invalid").not().isEmpty(),
     validateFields,
   ],
@@ -39,7 +39,7 @@ router.put(
   "/:id",
   [
     validateJWT,
-    /*  hasRole("ADMIN"), */
+    hasRole("teacher","admin"),
     check("name").custom(NameNotEmpty),
     check("id", "Not valid id").isUUID(4),
     check("id").custom(existsActivityForId),
@@ -53,7 +53,7 @@ router.delete(
   "/:id",
   [
     validateJWT,
-    /* hasRole("ADMIN"), */
+    hasRole("teacher","admin"),
     check("id", "Not valid id").isUUID(4),
     check("id").custom(existsActivityForId),
     validateFields,

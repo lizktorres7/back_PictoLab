@@ -42,7 +42,7 @@ const pictogramPost = async (req = request, res = response) => {
     const pictogram = await Pictogram.create({
       name,
       description,
-      //userId: req.user.id,
+      userId: req.user.id,
       storageId: img.id,
     });
 
@@ -183,23 +183,6 @@ const pictogramAssingCategoriesUpdate = async (picto_id, cat) => {
     console.log(error);
   }
 };
-
-/**
- * ACTUALIZAR IMG AL PICTOGRAMA
- * @param {*} pictogramId 
- * @param {*} storageId 
- */
-/* const pictogramAssingSynonymsUpdate = async (pictogramId, storageId) => {
-  const img = await Storage.findByPk(storageId) // Buscar la nueva imagen en la base de datos
-  if (!img) {
-    throw new Error('Image not found');
-  }
-  await Pictogram.update({ storageId: img.id }, { // Actualizar el storageId con el id de la nueva imagen
-    where: {
-      id: pictogramId,
-    },
-  });
-}; */
 
 
 

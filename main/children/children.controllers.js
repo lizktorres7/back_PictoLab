@@ -73,9 +73,18 @@ const childrenPost = async (req = request, res = response) => {
 const childrenPut = async (req, res = response) => {
   /* const { id } = req.params; */
 
-  const { _id, updatedAt, createdAt, tutorId, state, ...resto } = req.body;
+  const { id, updatedAt, createdAt, tutorId, state, ...resto } = req.body;
+
+  const user = await getUserJWT(req)
+  const children = await Children.findOne({ where: { state: true, id: req.params.id } })
+  const tutor = await Tutor.findOne({ where: { state: true, userId: user.id } })
 
   try {
+
+    if (!tutor || tutor.id != children.tutorId) {
+      return res.status(401).json({ msg: "UNAUTHORIZED" })
+    }
+
     await Children.update(resto, {
       where: {
         id: req.params.id,
@@ -99,13 +108,23 @@ const childrenPut = async (req, res = response) => {
 const childrenDelete = async (req, res = response) => {
   /* const { id } = req.params; */
 
+  const user = await getUserJWT(req)
+  const children = await Children.findOne({ where: { state: true, id: req.params.id } })
+  const tutor = await Tutor.findOne({ where: { state: true, userId: user.id } })
+
   try {
-    const children = await Children.update({ state: false }, {
+
+    if (!tutor || tutor.id != children.tutorId) {
+      console.log(error);
+      return res.status(401).json({ msg: "UNAUTHORIZED" })
+    }
+
+    const mm_children = await Children.update({ state: false }, {
       where: {
         id: req.params.id,
       },
     });
-    res.json({ children });
+    res.json({ mm_children });
 
   } catch (error) {
     console.log(error);

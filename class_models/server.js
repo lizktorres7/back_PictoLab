@@ -1,6 +1,7 @@
 var express = require("express");
 var cors = require("cors");
 const { sequelize } = require("../database/conf");
+const { credentials, corsOptions } = require("../middlewares/validate-cors");
 
 class Server {
   constructor() {
@@ -44,8 +45,10 @@ class Server {
   }
 
   middelwares() {
+    //CREDENTIALS
+    this.app.use(credentials);
     //CORS
-    this.app.use(cors());
+    this.app.use(cors(corsOptions));
     //LECTURA Y PARCEO DEL BODY
     this.app.use(express.json());
     //DIRECTORIO PUBLICO

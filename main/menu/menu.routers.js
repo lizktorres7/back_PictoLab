@@ -21,13 +21,14 @@ const router = Router();
 
 
 // GET ITEM
-router.get("/", [validateJWT, /* hasRole("ADMIN"), */ validateFields], menuGet);
+router.get("/", [validateJWT, validateFields], menuGet);
 
 // CREATE
 router.post("/", 
 [
   validateJWT, 
-  /* hasRole("ADMIN"), */
+  hasRole("chef","admin"),
+
   check("event", "The event is invalid").not().isEmpty(), 
   validateFields,
 ], 
@@ -39,7 +40,8 @@ router.put(
   "/:id",
   [
     validateJWT,
-    /* hasRole("ADMIN"), */
+    hasRole("chef","admin"),
+
     check("id", "Not valid id").isUUID(4),
     check("id").custom(existsMenuForId),
     check("event", "The event name is empty").not().isEmpty(), 
@@ -57,7 +59,8 @@ router.delete(
   "/:id",
   [
     validateJWT,
-    /* hasRole("ADMIN"), */
+    hasRole("chef","admin"),
+    
     check("id", "Not valid id").isUUID(4),
     check("id").custom(existsMenuForId),
     validateFields,

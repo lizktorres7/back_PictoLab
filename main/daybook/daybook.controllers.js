@@ -1,5 +1,6 @@
 const { response, request } = require("express");
-const { Daybook, Teacher, DaybookActivity } = require("../models/index");
+const { Daybook, Teacher, DaybookActivity, Activity } = require("../models/index");
+const { getUserJWT } = require("../heplers/get-userJWT");
 
 /**
  * FUNCION PARA OBTENER UNA AGENDA
@@ -29,13 +30,41 @@ const daybookGet = async (req = request, res = response) => {
   }
 };
 
+const daybookGetActivitis = async (req = request, res = response) => {
+  const { id } = req.params;
+  try {
+
+    const query = { state: true, daybookId: id };
+    const mm_data_db = await DaybookActivity.findAll({
+      where: query
+    })
+
+    let mm_response = []
+
+    for (let index = 0; index < mm_data_db.length; index++) {
+      const element = mm_data_db[index];
+      let activ = await Activity.findOne({
+        where: { id: element.activityId }
+      })
+      mm_response.push({ daybook: id, comment: element.comment, activity: activ.get({ plain: true }) })
+    }
+
+    res.json({ activitys: mm_response });
+
+  } catch (error) {
+    res.status(500).json({
+      msg: "Talk to the administrator",
+    });
+  }
+}
+
 /**
  * FUNCION PARA CREAR UNA AGENDA
  * @param {*} req 
  * @param {*} res 
  */
 const daybookPost = async (req = request, res = response) => {
-  const { name, date, summary, childId, start_time, end_time, comment } = req.body;
+  const { name, date, summary, childId, comment, activitys } = req.body;
   const user = await getUserJWT(req)
   const teacher = await Teacher.findOne({ where: { state: true, userId: user.id } })
 
@@ -54,7 +83,7 @@ const daybookPost = async (req = request, res = response) => {
     });
 
     // Asociar el tablero con categorias
-    await dashboardAssingActivity(daybook.id, start_time, end_time, comment)
+    await dashboardAssingActivity(daybook.id, comment, activitys)
 
     res.json({ daybook });
 
@@ -73,21 +102,22 @@ const daybookPost = async (req = request, res = response) => {
  * @param {*} res 
  */
 const daybookPut = async (req, res = response) => {
-  /*  const { id } = req.params; */
-  const { _id, updatedAt, createdAt, state, childId, teacherId, ...resto } = req.body;
+  /* const { id } = req.params; */
+  const { id, updatedAt, createdAt, state, childId, teacherId, ...resto } = req.body;
+  console.log('ID DAY BOOK ', req.params.id)
   const user = await getUserJWT(req)
+  const daybook = await Daybook.findOne({ where: { state: true, id: req.params.id } })
   const teacher = await Teacher.findOne({ where: { state: true, userId: user.id } })
-  const creator = await Activity.findOne({ id: req.params.id })
 
   try {
-    if ((!teacher) || teacher.id != creator.id) {
+    console.log('TEACHER : ', teacher?.get({ plain: true }).id, '\n DAYBOOK : ', daybook?.get({ plain: true }).teacherId)
+    if (!teacher || teacher.id != daybook.teacherId) {
       return res.status(401).json({ msg: "UNAUTHORIZED" })
     }
 
     await Daybook.update(resto, {
       where: {
         id: req.params.id,
-
       },
     });
 
@@ -107,22 +137,23 @@ const daybookPut = async (req, res = response) => {
  * @param {*} res 
  */
 const daybookDelete = async (req, res = response) => {
-  const { id } = req.params;
+  console.log('ID DAY BOOK ', req.params.id)
   const user = await getUserJWT(req)
+  const daybook = await Daybook.findOne({ where: { state: true, id: req.params.id } })
   const teacher = await Teacher.findOne({ where: { state: true, userId: user.id } })
 
   try {
-    if (!teacher) {
-      console.log(error);
-      res.status(401).json({ msg: "UNAUTHORIZED" })
+    console.log('TEACHER : ', teacher?.get({ plain: true }).id, '\n DAYBOOK : ', daybook?.get({ plain: true }).teacherId)
+    if (!teacher || teacher.id != daybook.teacherId) {
+      return res.status(401).json({ msg: "UNAUTHORIZED" })
     }
 
-    const daybook = await Daybook.update({ state: false }, {
+    const mm_daybook = await Daybook.update({ state: false }, {
       where: {
-        id,
+        id: req.params.id,
       },
     });
-    res.json({ daybook });
+    res.json({ mm_daybook });
 
   } catch (error) {
     console.log(error);
@@ -138,11 +169,11 @@ const daybookDelete = async (req, res = response) => {
  * @param {*} dash_id 
  * @param {*} cat 
  */
-const dashboardAssingActivity = async (dash_id, cat) => {
+const dashboardAssingActivity = async (aybook_id , comment, activity_ids) => {
   try {
-    for (let index = 0; index < cat.length; index++) {
-      const cat_id = cat[index];
-      await DashboardCategory.create({ categoryId: cat_id, dashboardId: dash_id });
+    for (let index = 0; index < activity_ids.length; index++) {
+      const mm_activ_id = activity_ids[index];
+      await DaybookActivity.create({ daybookId: aybook_id, activityId: mm_activ_id, comment: comment });
     }
   } catch (error) {
     console.log(error);
@@ -154,4 +185,5 @@ module.exports = {
   daybookPost,
   daybookPut,
   daybookDelete,
+  daybookGetActivitis
 };
